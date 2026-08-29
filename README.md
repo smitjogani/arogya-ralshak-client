@@ -35,6 +35,32 @@ To guarantee accuracy and prevent LLM "hallucinations" in math, Aarogya-Rakshak 
 
 ---
 
+## 👨‍💻 Flutter Developer Guidance (What to Build & Action Plan)
+
+To implement the hybrid architecture efficiently, follow this step-by-step action plan:
+
+### 1. Core UI Screens
+- **Home/Dashboard:** Display previous offline calculations, an option to start a new scan, and an optional "Sync to Cloud" button.
+- **Document Scanner (Camera View):** A custom camera interface guiding the user to capture crisp, well-lit images of their insurance policy and hospital bill.
+- **Processing Screen:** A loading state screen that visually breaks down the offline processing steps to the user (e.g., "Extracting text...", "AI analyzing clauses...", "Calculating financials...").
+- **Final Financial Snapshot View:** The core output screen displaying the calculated `Payable Amount`, `Out-of-Pocket Estimate`, extracted JSON summary, and the AI-generated advice/questions for the hospital.
+
+### 2. Core Services to Implement
+- **`CameraService`**: Wraps the Flutter `camera` plugin to handle capturing high-resolution photos securely.
+- **`OCRService`**: Integrates `google_mlkit_text_recognition` to take the captured image and return raw, unformatted text strings.
+- **`LLMService`**: The most critical service. Loads the `.tflite` model via `mediapipe_genai` (or `mlc_llm`), constructs a strict prompt forcing a JSON response, feeds the OCR text, and parses the output into a typed Dart model.
+- **`CalculationEngine`**: A pure Dart utility class that takes the parsed AI entities and deterministically calculates the final financial figures without relying on the LLM's math capabilities.
+
+### 3. State Management Flow
+Using GetX (or Provider), the data should flow linearly without blocking the main UI thread:
+1. **User action:** Triggers `CameraService`.
+2. **Image data:** Passed to `OCRService` (State: `isExtractingText = true`).
+3. **String data:** Passed to `LLMService` (State: `isAnalyzing = true`).
+4. **Parsed JSON:** Passed to `CalculationEngine` (State: `isCalculating = true`).
+5. **Final Result:** Updates the ViewModel, navigating the user to the Final Financial Snapshot View.
+
+---
+
 ## 📁 Folder Structure
 
 ```text
