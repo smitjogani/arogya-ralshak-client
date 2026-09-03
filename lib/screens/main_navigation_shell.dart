@@ -1,0 +1,226 @@
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import '../controllers/app_controller.dart';
+import '../theme/app_colors.dart';
+import 'emergency/emergency_mode_screen.dart';
+import 'finances/finances_clarity_screen.dart';
+import 'home/home_dashboard_screen.dart';
+import 'profile/profile_settings_screen.dart';
+
+class MainNavigationShell extends StatelessWidget {
+  const MainNavigationShell({super.key});
+
+  static final List<Widget> _screens = [
+    const HomeDashboardScreen(),
+    const EmergencyModeScreen(),
+    const FinancesClarityScreen(),
+    const ProfileSettingsScreen(),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    final AppController controller = Get.find<AppController>();
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    return Obx(() {
+      final int currentIndex = controller.currentTab.value;
+      final bool isEmergencyActive = controller.isEmergencyActive.value;
+
+      return Scaffold(
+        body: IndexedStack(
+          index: currentIndex,
+          children: _screens,
+        ),
+        bottomNavigationBar: Container(
+          decoration: BoxDecoration(
+            color: isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
+            boxShadow: [
+              BoxShadow(
+                color: isDark ? Colors.black38 : AppColors.shadowColor,
+                blurRadius: 16,
+                offset: const Offset(0, -4),
+              ),
+            ],
+            border: Border(
+              top: BorderSide(
+                color: isEmergencyActive
+                    ? AppColors.emergencyRed.withValues(alpha: 0.5)
+                    : (isDark ? AppColors.borderDark : AppColors.borderLight),
+                width: isEmergencyActive ? 2.0 : 1.0,
+              ),
+            ),
+          ),
+          child: SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 6.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  _buildNavItem(
+                    context,
+                    controller: controller,
+                    index: 0,
+                    icon: Icons.home_rounded,
+                    activeIcon: Icons.home_rounded,
+                    label: "Home",
+                    isActive: currentIndex == 0,
+                  ),
+                  _buildEmergencyNavItem(
+                    context,
+                    controller: controller,
+                    index: 1,
+                    isActive: currentIndex == 1,
+                    isEmergencyActive: isEmergencyActive,
+                  ),
+                  _buildNavItem(
+                    context,
+                    controller: controller,
+                    index: 2,
+                    icon: Icons.account_balance_wallet_outlined,
+                    activeIcon: Icons.account_balance_wallet_rounded,
+                    label: "Finances",
+                    isActive: currentIndex == 2,
+                  ),
+                  _buildNavItem(
+                    context,
+                    controller: controller,
+                    index: 3,
+                    icon: Icons.person_outline_rounded,
+                    activeIcon: Icons.person_rounded,
+                    label: "Profile",
+                    isActive: currentIndex == 3,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
+    });
+  }
+
+  Widget _buildNavItem(
+    BuildContext context, {
+    required AppController controller,
+    required int index,
+    required IconData icon,
+    required IconData activeIcon,
+    required String label,
+    required bool isActive,
+  }) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final color = isActive
+        ? AppColors.primaryTeal
+        : (isDark ? AppColors.textMutedDark : AppColors.textMutedLight);
+
+    return InkWell(
+      onTap: () => controller.changeTab(index),
+      borderRadius: BorderRadius.circular(16),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 250),
+              padding: const EdgeInsets.all(6),
+              decoration: BoxDecoration(
+                color: isActive
+                    ? AppColors.primaryTeal.withValues(alpha: 0.12)
+                    : Colors.transparent,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Icon(
+                isActive ? activeIcon : icon,
+                color: color,
+                size: 24,
+              ),
+            ),
+            const SizedBox(height: 2),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: isActive ? FontWeight.w700 : FontWeight.w500,
+                color: color,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildEmergencyNavItem(
+    BuildContext context, {
+    required AppController controller,
+    required int index,
+    required bool isActive,
+    required bool isEmergencyActive,
+  }) {
+    return InkWell(
+      onTap: () => controller.changeTab(index),
+      borderRadius: BorderRadius.circular(18),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 300),
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+              decoration: BoxDecoration(
+                gradient: isEmergencyActive
+                    ? const LinearGradient(
+                        colors: [AppColors.emergencyRed, Color(0xFFC02633)],
+                      )
+                    : const LinearGradient(
+                        colors: [AppColors.accentGold, Color(0xFFB5840A)],
+                      ),
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: (isEmergencyActive ? AppColors.emergencyRed : AppColors.accentGold)
+                        .withValues(alpha: 0.35),
+                    blurRadius: 10,
+                    offset: const Offset(0, 3),
+                  ),
+                ],
+              ),
+              child: const Row(
+                children: [
+                  Icon(
+                    Icons.medical_services_rounded,
+                    color: Colors.white,
+                    size: 20,
+                  ),
+                  SizedBox(width: 4),
+                  Text(
+                    "SOS",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w800,
+                      fontSize: 12.5,
+                      letterSpacing: 0.5,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              "Emergency",
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: isActive ? FontWeight.bold : FontWeight.w600,
+                color: isEmergencyActive
+                    ? AppColors.emergencyRed
+                    : (isActive ? AppColors.accentGold : AppColors.accentDarkGold),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
