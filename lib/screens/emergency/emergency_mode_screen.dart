@@ -777,8 +777,10 @@ class _EmergencyModeScreenState extends State<EmergencyModeScreen> {
     Get.bottomSheet(
       ResponsiveCenter(
         maxWidth: 550,
-        child: Container(
-          padding: const EdgeInsets.all(22),
+        child: SafeArea(
+          bottom: true,
+          child: Container(
+            padding: const EdgeInsets.all(22),
           decoration: BoxDecoration(
             color: Theme.of(context).cardColor,
             borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
@@ -846,6 +848,7 @@ class _EmergencyModeScreenState extends State<EmergencyModeScreen> {
           ),
         ),
       ),
+    ),
     );
   }
 
@@ -888,8 +891,10 @@ class _EmergencyModeScreenState extends State<EmergencyModeScreen> {
     Get.bottomSheet(
       ResponsiveCenter(
         maxWidth: 550,
-        child: Container(
-          padding: const EdgeInsets.all(22),
+        child: SafeArea(
+          bottom: true,
+          child: Container(
+            padding: const EdgeInsets.all(22),
           decoration: BoxDecoration(
             color: Theme.of(context).cardColor,
             borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
@@ -943,6 +948,7 @@ class _EmergencyModeScreenState extends State<EmergencyModeScreen> {
           ),
         ),
       ),
+    ),
     );
   }
 }

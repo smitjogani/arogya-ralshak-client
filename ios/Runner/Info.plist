@@ -7,7 +7,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
-	<string>Abs</string>
+	<string>Aarogya-Rakshak</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -15,7 +15,7 @@
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
-	<string>abs</string>
+	<string>Aarogya-Rakshak</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
@@ -26,6 +26,20 @@
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
+	<key>UIViewControllerBasedStatusBarAppearance</key>
+	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>Aarogya-Rakshak requires camera access to scan medical bills, prescriptions, and health insurance cards on-device.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Aarogya-Rakshak requires photo library access to upload medical invoices and pre-authorization documents.</string>
+	<key>NSFaceIDUsageDescription</key>
+	<string>Aarogya-Rakshak uses Face ID / Touch ID for quick biometric security to unlock emergency health passes.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Aarogya-Rakshak needs location access to show nearby cashless network hospitals in emergency mode.</string>
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>Aarogya-Rakshak uses local network for secure on-device AI model synchronization.</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

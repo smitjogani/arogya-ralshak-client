@@ -696,12 +696,14 @@ class HomeDashboardScreen extends StatelessWidget {
     Get.bottomSheet(
       ResponsiveCenter(
         maxWidth: 550,
-        child: Container(
-          padding: const EdgeInsets.all(22),
-          decoration: BoxDecoration(
-            color: Theme.of(context).cardColor,
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-          ),
+        child: SafeArea(
+          bottom: true,
+          child: Container(
+            padding: const EdgeInsets.all(22),
+            decoration: BoxDecoration(
+              color: Theme.of(context).cardColor,
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+            ),
           child: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -784,6 +786,7 @@ class HomeDashboardScreen extends StatelessWidget {
           ),
         ),
       ),
+    ),
       isScrollControlled: true,
     );
   }
@@ -792,8 +795,10 @@ class HomeDashboardScreen extends StatelessWidget {
     Get.bottomSheet(
       ResponsiveCenter(
         maxWidth: 550,
-        child: Container(
-          padding: const EdgeInsets.all(22),
+        child: SafeArea(
+          bottom: true,
+          child: Container(
+            padding: const EdgeInsets.all(22),
           decoration: BoxDecoration(
             color: Theme.of(context).cardColor,
             borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
@@ -859,6 +864,7 @@ class HomeDashboardScreen extends StatelessWidget {
           ),
         ),
       ),
+    ),
     );
   }
 }
