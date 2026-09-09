@@ -7,6 +7,7 @@ import '../../widgets/ai_insight_card.dart';
 import '../../widgets/app_card.dart';
 import '../../widgets/app_logo.dart';
 import '../../widgets/custom_button.dart';
+import '../../widgets/responsive_layout.dart';
 import '../../widgets/section_header.dart';
 import '../../widgets/status_badge.dart';
 
@@ -17,6 +18,7 @@ class HomeDashboardScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final AppController controller = Get.find<AppController>();
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isWide = ResponsiveLayout.isWide(context);
 
     return Scaffold(
       appBar: AppBar(
@@ -32,7 +34,9 @@ class HomeDashboardScreen extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
-                    color: isDark ? AppColors.textPrimaryDark : AppColors.primaryTeal,
+                    color: isDark
+                        ? AppColors.textPrimaryDark
+                        : AppColors.primaryTeal,
                   ),
                 ),
                 Text(
@@ -48,14 +52,18 @@ class HomeDashboardScreen extends StatelessWidget {
           ],
         ),
         actions: [
-          Obx(() => IconButton(
-                icon: Icon(
-                  controller.isDarkMode.value ? Icons.wb_sunny_rounded : Icons.nightlight_round,
-                  color: AppColors.accentGold,
-                ),
-                onPressed: () => controller.toggleTheme(),
-                tooltip: "Toggle Theme",
-              )),
+          Obx(
+            () => IconButton(
+              icon: Icon(
+                controller.isDarkMode.value
+                    ? Icons.wb_sunny_rounded
+                    : Icons.nightlight_round,
+                color: AppColors.accentGold,
+              ),
+              onPressed: () => controller.toggleTheme(),
+              tooltip: "Toggle Theme",
+            ),
+          ),
           const SizedBox(width: 8),
         ],
       ),
@@ -63,124 +71,157 @@ class HomeDashboardScreen extends StatelessWidget {
         onRefresh: () async {
           await Future.delayed(const Duration(milliseconds: 600));
         },
-        child: SingleChildScrollView(
-          physics: const AlwaysScrollableScrollPhysics(),
-          padding: const EdgeInsets.symmetric(horizontal: 18.0, vertical: 12.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Greeting Header
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "Namaste, Rajesh 👋",
-                        style: TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.w800,
-                          color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        "Policy: HDFC ERGO Optima Secure",
-                        style: TextStyle(
-                          fontSize: 13,
-                          color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight,
-                        ),
-                      ),
-                    ],
-                  ),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                    decoration: BoxDecoration(
-                      color: AppColors.accentGold.withValues(alpha: 0.15),
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: AppColors.accentGold.withValues(alpha: 0.4)),
-                    ),
-                    child: const Row(
+        child: ResponsiveCenter(
+          child: SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            padding: const EdgeInsets.symmetric(horizontal: 18.0, vertical: 12.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Greeting Header
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Icon(Icons.star_rounded, size: 14, color: AppColors.accentGold),
-                        SizedBox(width: 4),
                         Text(
-                          "₹10L Cover",
+                          "Namaste, Rajesh 👋",
                           style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFF9E750B),
+                            fontSize: 22,
+                            fontWeight: FontWeight.w800,
+                            color: isDark
+                                ? AppColors.textPrimaryDark
+                                : AppColors.textPrimaryLight,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          "Policy: HDFC ERGO Optima Secure",
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: isDark
+                                ? AppColors.textSecondaryDark
+                                : AppColors.textSecondaryLight,
                           ),
                         ),
                       ],
                     ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 5,
+                      ),
+                      decoration: BoxDecoration(
+                        color: AppColors.accentGold.withValues(alpha: 0.15),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: AppColors.accentGold.withValues(alpha: 0.4),
+                        ),
+                      ),
+                      child: const Row(
+                        children: [
+                          Icon(
+                            Icons.star_rounded,
+                            size: 14,
+                            color: AppColors.accentGold,
+                          ),
+                          SizedBox(width: 4),
+                          Text(
+                            "₹10L Cover",
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFF9E750B),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+
+                // Responsive Top Hero Cards: Side-by-side on wide screens, vertical on mobile
+                if (isWide) ...[
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: _buildProtectionStatusCard(context, controller, isDark),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: _buildEmergencyTriggerBanner(context, controller),
+                      ),
+                    ],
                   ),
+                  const SizedBox(height: 18),
+                ] else ...[
+                  _buildProtectionStatusCard(context, controller, isDark),
+                  const SizedBox(height: 18),
+                  _buildEmergencyTriggerBanner(context, controller),
+                  const SizedBox(height: 18),
                 ],
-              ),
-              const SizedBox(height: 16),
 
-              // Status Card ("You're protected • AI running on-device")
-              _buildProtectionStatusCard(context, controller, isDark),
-              const SizedBox(height: 18),
+                // Privacy Badge ("100% On-Device • No data leaves your phone")
+                _buildPrivacyBadge(context, isDark),
+                const SizedBox(height: 20),
 
-              // Emergency Mode Prominent Card
-              _buildEmergencyTriggerBanner(context, controller),
-              const SizedBox(height: 18),
+                // Quick Actions Grid
+                SectionHeader(
+                  title: "Quick Actions",
+                  subtitle: "Manage expenses, coverage & network",
+                  icon: Icons.flash_on_rounded,
+                ),
+                const SizedBox(height: 10),
+                _buildQuickActionsGrid(context, controller, isDark),
+                const SizedBox(height: 22),
 
-              // Privacy Badge ("100% On-Device • No data leaves your phone")
-              _buildPrivacyBadge(context, isDark),
-              const SizedBox(height: 20),
+                // AI Financial Insights Highlights
+                SectionHeader(
+                  title: "AI Clarity Insights",
+                  subtitle: "On-device recommendations for savings",
+                  actionText: "View All",
+                  onActionTap: () => controller.changeTab(2),
+                  icon: Icons.auto_awesome_rounded,
+                ),
+                const SizedBox(height: 10),
+                Obx(() {
+                  if (controller.aiInsights.isEmpty) {
+                    return const SizedBox.shrink();
+                  }
+                  return AIInsightCard(
+                    insight: controller.aiInsights.first,
+                    onAction: () => controller.changeTab(2),
+                  );
+                }),
+                const SizedBox(height: 22),
 
-              // Quick Actions Grid
-              SectionHeader(
-                title: "Quick Actions",
-                subtitle: "Manage expenses, coverage & network",
-                icon: Icons.flash_on_rounded,
-              ),
-              const SizedBox(height: 10),
-              _buildQuickActionsGrid(context, controller, isDark),
-              const SizedBox(height: 22),
-
-              // AI Financial Insights Highlights
-              SectionHeader(
-                title: "AI Clarity Insights",
-                subtitle: "On-device recommendations for savings",
-                actionText: "View All",
-                onActionTap: () => controller.changeTab(2),
-                icon: Icons.auto_awesome_rounded,
-              ),
-              const SizedBox(height: 10),
-              Obx(() {
-                if (controller.aiInsights.isEmpty) {
-                  return const SizedBox.shrink();
-                }
-                return AIInsightCard(
-                  insight: controller.aiInsights.first,
-                  onAction: () => controller.changeTab(2),
-                );
-              }),
-              const SizedBox(height: 22),
-
-              // Recent Activity Section
-              SectionHeader(
-                title: "Recent Medical Expenses",
-                subtitle: "Claims & pre-authorizations logged",
-                actionText: "See Finances",
-                onActionTap: () => controller.changeTab(2),
-                icon: Icons.receipt_long_rounded,
-              ),
-              const SizedBox(height: 10),
-              _buildRecentActivityList(context, controller, isDark),
-              const SizedBox(height: 20),
-            ],
+                // Recent Activity Section
+                SectionHeader(
+                  title: "Recent Medical Expenses",
+                  subtitle: "Claims & pre-authorizations logged",
+                  actionText: "See Finances",
+                  onActionTap: () => controller.changeTab(2),
+                  icon: Icons.receipt_long_rounded,
+                ),
+                const SizedBox(height: 10),
+                _buildRecentActivityList(context, controller, isDark),
+                const SizedBox(height: 20),
+              ],
+            ),
           ),
         ),
       ),
     );
   }
 
-  Widget _buildProtectionStatusCard(BuildContext context, AppController controller, bool isDark) {
+  Widget _buildProtectionStatusCard(
+    BuildContext context,
+    AppController controller,
+    bool isDark,
+  ) {
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
@@ -233,14 +274,18 @@ class HomeDashboardScreen extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(width: 6),
-                      Obx(() => Text(
-                            controller.isAiModelReady.value ? "AI Online" : "AI Syncing",
-                            style: const TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w600,
-                              color: Color(0xFF4EFEAA),
-                            ),
-                          )),
+                      Obx(
+                        () => Text(
+                          controller.isAiModelReady.value
+                              ? "AI Online"
+                              : "AI Syncing",
+                          style: const TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                            color: Color(0xFF4EFEAA),
+                          ),
+                        ),
+                      ),
                     ],
                   ),
                 ],
@@ -271,24 +316,23 @@ class HomeDashboardScreen extends StatelessWidget {
                 children: [
                   Row(
                     children: [
-                      const Icon(Icons.memory_rounded, size: 16, color: AppColors.accentGold),
+                      const Icon(
+                        Icons.memory_rounded,
+                        size: 16,
+                        color: AppColors.accentGold,
+                      ),
                       const SizedBox(width: 6),
-                      Obx(() => Text(
-                            controller.aiModelVersion.value,
-                            style: const TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w600,
-                              color: AppColors.accentGold,
-                            ),
-                          )),
+                      Obx(
+                        () => Text(
+                          controller.aiModelVersion.value,
+                          style: const TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.accentGold,
+                          ),
+                        ),
+                      ),
                     ],
-                  ),
-                  const Text(
-                    "0ms Network Latency",
-                    style: TextStyle(
-                      fontSize: 11.5,
-                      color: Colors.white70,
-                    ),
                   ),
                 ],
               ),
@@ -299,7 +343,10 @@ class HomeDashboardScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildEmergencyTriggerBanner(BuildContext context, AppController controller) {
+  Widget _buildEmergencyTriggerBanner(
+    BuildContext context,
+    AppController controller,
+  ) {
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(22),
@@ -352,7 +399,11 @@ class HomeDashboardScreen extends StatelessWidget {
                             ),
                           ),
                           SizedBox(width: 8),
-                          Icon(Icons.bolt_rounded, size: 16, color: AppColors.accentGold),
+                          Icon(
+                            Icons.bolt_rounded,
+                            size: 16,
+                            color: AppColors.accentGold,
+                          ),
                         ],
                       ),
                       const SizedBox(height: 2),
@@ -395,7 +446,11 @@ class HomeDashboardScreen extends StatelessWidget {
       ),
       child: const Row(
         children: [
-          Icon(Icons.verified_user_rounded, color: AppColors.protectiveGreen, size: 20),
+          Icon(
+            Icons.verified_user_rounded,
+            color: AppColors.protectiveGreen,
+            size: 20,
+          ),
           SizedBox(width: 10),
           Expanded(
             child: Text(
@@ -412,14 +467,31 @@ class HomeDashboardScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildQuickActionsGrid(BuildContext context, AppController controller, bool isDark) {
+  Widget _buildQuickActionsGrid(
+    BuildContext context,
+    AppController controller,
+    bool isDark,
+  ) {
+    final isWide = ResponsiveLayout.isWide(context);
+    final isDesktop = ResponsiveLayout.isDesktop(context);
+
+    int crossAxisCount = 2;
+    double childAspectRatio = 1.5;
+    if (isDesktop) {
+      crossAxisCount = 4;
+      childAspectRatio = 1.8;
+    } else if (isWide) {
+      crossAxisCount = 4;
+      childAspectRatio = 1.6;
+    }
+
     return GridView.count(
-      crossAxisCount: 2,
+      crossAxisCount: crossAxisCount,
       crossAxisSpacing: 12,
       mainAxisSpacing: 12,
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
-      childAspectRatio: 1.5,
+      childAspectRatio: childAspectRatio,
       children: [
         _buildActionTile(
           context,
@@ -491,7 +563,9 @@ class HomeDashboardScreen extends StatelessWidget {
             style: TextStyle(
               fontSize: 14.5,
               fontWeight: FontWeight.bold,
-              color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
+              color: isDark
+                  ? AppColors.textPrimaryDark
+                  : AppColors.textPrimaryLight,
             ),
           ),
           const SizedBox(height: 2),
@@ -501,7 +575,9 @@ class HomeDashboardScreen extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
             style: TextStyle(
               fontSize: 11.5,
-              color: isDark ? AppColors.textMutedDark : AppColors.textMutedLight,
+              color: isDark
+                  ? AppColors.textMutedDark
+                  : AppColors.textMutedLight,
             ),
           ),
         ],
@@ -509,7 +585,11 @@ class HomeDashboardScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildRecentActivityList(BuildContext context, AppController controller, bool isDark) {
+  Widget _buildRecentActivityList(
+    BuildContext context,
+    AppController controller,
+    bool isDark,
+  ) {
     return Obx(() {
       final list = controller.activities.take(3).toList();
       return Column(
@@ -563,7 +643,9 @@ class HomeDashboardScreen extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 14.5,
                             fontWeight: FontWeight.bold,
-                            color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
+                            color: isDark
+                                ? AppColors.textPrimaryDark
+                                : AppColors.textPrimaryLight,
                           ),
                         ),
                         const SizedBox(height: 2),
@@ -571,7 +653,9 @@ class HomeDashboardScreen extends StatelessWidget {
                           "${item.providerName} • ${item.category}",
                           style: TextStyle(
                             fontSize: 12,
-                            color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight,
+                            color: isDark
+                                ? AppColors.textSecondaryDark
+                                : AppColors.textSecondaryLight,
                           ),
                         ),
                       ],
@@ -585,7 +669,9 @@ class HomeDashboardScreen extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.w800,
-                          color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
+                          color: isDark
+                              ? AppColors.textPrimaryDark
+                              : AppColors.textPrimaryLight,
                         ),
                       ),
                       const SizedBox(height: 4),
@@ -608,80 +694,93 @@ class HomeDashboardScreen extends StatelessWidget {
     String category = 'Hospitalization';
 
     Get.bottomSheet(
-      Container(
-        padding: const EdgeInsets.all(22),
-        decoration: BoxDecoration(
-          color: Theme.of(context).cardColor,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-        ),
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text(
-                    "Add Medical Expense",
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.close_rounded),
-                    onPressed: () => Get.back(),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 12),
-              TextField(
-                controller: titleController,
-                decoration: InputDecoration(
-                  labelText: "Expense Description (e.g. ICU Room Deposit)",
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                ),
-              ),
-              const SizedBox(height: 12),
-              TextField(
-                controller: providerController,
-                decoration: InputDecoration(
-                  labelText: "Hospital / Provider Name",
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                ),
-              ),
-              const SizedBox(height: 12),
-              TextField(
-                controller: amountController,
-                keyboardType: TextInputType.number,
-                decoration: InputDecoration(
-                  labelText: "Total Amount (₹)",
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                ),
-              ),
-              const SizedBox(height: 16),
-              CustomButton(
-                text: "Save & Run On-Device Analysis",
-                icon: Icons.check_circle_rounded,
-                onPressed: () {
-                  final amt = double.tryParse(amountController.text) ?? 5000.0;
-                  final title = titleController.text.isNotEmpty ? titleController.text : "Medical Expense";
-                  final provider = providerController.text.isNotEmpty ? providerController.text : "Local Healthcare Provider";
-
-                  controller.addBill(
-                    MedicalActivity(
-                      id: "ACT-${DateTime.now().millisecondsSinceEpoch}",
-                      title: title,
-                      providerName: provider,
-                      amount: amt,
-                      coveredAmount: amt * 0.9,
-                      date: DateTime.now(),
-                      status: ActivityStatus.approved,
-                      category: category,
+      ResponsiveCenter(
+        maxWidth: 550,
+        child: Container(
+          padding: const EdgeInsets.all(22),
+          decoration: BoxDecoration(
+            color: Theme.of(context).cardColor,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+          ),
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      "Add Medical Expense",
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                     ),
-                  );
-                  Get.back();
-                },
-              ),
-            ],
+                    IconButton(
+                      icon: const Icon(Icons.close_rounded),
+                      onPressed: () => Get.back(),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: titleController,
+                  decoration: InputDecoration(
+                    labelText: "Expense Description (e.g. ICU Room Deposit)",
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: providerController,
+                  decoration: InputDecoration(
+                    labelText: "Hospital / Provider Name",
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: amountController,
+                  keyboardType: TextInputType.number,
+                  decoration: InputDecoration(
+                    labelText: "Total Amount (₹)",
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                CustomButton(
+                  text: "Save & Run On-Device Analysis",
+                  icon: Icons.check_circle_rounded,
+                  onPressed: () {
+                    final amt = double.tryParse(amountController.text) ?? 5000.0;
+                    final title = titleController.text.isNotEmpty
+                        ? titleController.text
+                        : "Medical Expense";
+                    final provider = providerController.text.isNotEmpty
+                        ? providerController.text
+                        : "Local Healthcare Provider";
+
+                    controller.addBill(
+                      MedicalActivity(
+                        id: "ACT-${DateTime.now().millisecondsSinceEpoch}",
+                        title: title,
+                        providerName: provider,
+                        amount: amt,
+                        coveredAmount: amt * 0.9,
+                        date: DateTime.now(),
+                        status: ActivityStatus.approved,
+                        category: category,
+                      ),
+                    );
+                    Get.back();
+                  },
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -691,61 +790,73 @@ class HomeDashboardScreen extends StatelessWidget {
 
   void _showCheckCoverageModal(BuildContext context, AppController controller) {
     Get.bottomSheet(
-      Container(
-        padding: const EdgeInsets.all(22),
-        decoration: BoxDecoration(
-          color: Theme.of(context).cardColor,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Row(
-              children: [
-                Icon(Icons.search_rounded, color: AppColors.primaryTeal),
-                SizedBox(width: 8),
-                Text(
-                  "On-Device Coverage Search",
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            TextField(
-              decoration: InputDecoration(
-                hintText: "Enter procedure or hospital (e.g. Angioplasty)",
-                prefixIcon: const Icon(Icons.search),
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-              ),
-            ),
-            const SizedBox(height: 16),
-            Container(
-              padding: const EdgeInsets.all(14),
-              decoration: BoxDecoration(
-                color: AppColors.protectiveGreen.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(14),
-              ),
-              child: const Row(
+      ResponsiveCenter(
+        maxWidth: 550,
+        child: Container(
+          padding: const EdgeInsets.all(22),
+          decoration: BoxDecoration(
+            color: Theme.of(context).cardColor,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Row(
                 children: [
-                  Icon(Icons.check_circle_rounded, color: AppColors.protectiveGreen),
-                  SizedBox(width: 10),
-                  Expanded(
-                    child: Text(
-                      "Angioplasty is 100% Cashless under your HDFC ERGO policy up to ₹10,00,000.",
-                      style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.protectiveGreen),
-                    ),
+                  Icon(Icons.search_rounded, color: AppColors.primaryTeal),
+                  SizedBox(width: 8),
+                  Text(
+                    "On-Device Coverage Search",
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                 ],
               ),
-            ),
-            const SizedBox(height: 16),
-            CustomButton(
-              text: "Close Search",
-              onPressed: () => Get.back(),
-              type: ButtonType.secondaryGold,
-            ),
-          ],
+              const SizedBox(height: 12),
+              TextField(
+                decoration: InputDecoration(
+                  hintText: "Enter procedure or hospital (e.g. Angioplasty)",
+                  prefixIcon: const Icon(Icons.search),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              Container(
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(
+                  color: AppColors.protectiveGreen.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: const Row(
+                  children: [
+                    Icon(
+                      Icons.check_circle_rounded,
+                      color: AppColors.protectiveGreen,
+                    ),
+                    SizedBox(width: 10),
+                    Expanded(
+                      child: Text(
+                        "Angioplasty is 100% Cashless under your HDFC ERGO policy up to ₹10,00,000.",
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.protectiveGreen,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 16),
+              CustomButton(
+                text: "Close Search",
+                onPressed: () => Get.back(),
+                type: ButtonType.secondaryGold,
+              ),
+            ],
+          ),
         ),
       ),
     );

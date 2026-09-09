@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controllers/app_controller.dart';
 import '../theme/app_colors.dart';
+import '../widgets/app_logo.dart';
+import '../widgets/responsive_layout.dart';
 import 'emergency/emergency_mode_screen.dart';
 import 'finances/finances_clarity_screen.dart';
 import 'home/home_dashboard_screen.dart';
@@ -21,11 +23,31 @@ class MainNavigationShell extends StatelessWidget {
   Widget build(BuildContext context) {
     final AppController controller = Get.find<AppController>();
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isWide = ResponsiveLayout.isWide(context);
 
     return Obx(() {
       final int currentIndex = controller.currentTab.value;
       final bool isEmergencyActive = controller.isEmergencyActive.value;
 
+      if (isWide) {
+        // Desktop / Tablet Layout with Left Side Navigation Drawer / NavigationRail
+        return Scaffold(
+          body: Row(
+            children: [
+              _buildSideNavigationRail(context, controller, isDark, currentIndex, isEmergencyActive),
+              const VerticalDivider(thickness: 1, width: 1),
+              Expanded(
+                child: IndexedStack(
+                  index: currentIndex,
+                  children: _screens,
+                ),
+              ),
+            ],
+          ),
+        );
+      }
+
+      // Mobile Layout with Bottom Navigation Bar
       return Scaffold(
         body: IndexedStack(
           index: currentIndex,
@@ -97,6 +119,252 @@ class MainNavigationShell extends StatelessWidget {
         ),
       );
     });
+  }
+
+  Widget _buildSideNavigationRail(
+    BuildContext context,
+    AppController controller,
+    bool isDark,
+    int currentIndex,
+    bool isEmergencyActive,
+  ) {
+    return Container(
+      width: 240,
+      color: isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
+      padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header Logo & Branding
+          Row(
+            children: [
+              const AppLogo(size: 38, animate: false),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "Aarogya",
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w900,
+                        color: isDark ? AppColors.textPrimaryDark : AppColors.primaryTeal,
+                        letterSpacing: -0.5,
+                      ),
+                    ),
+                    const Text(
+                      "Rakshak AI",
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.accentGold,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 32),
+
+          // Navigation Links
+          _buildSideNavItem(
+            context,
+            controller: controller,
+            index: 0,
+            icon: Icons.home_rounded,
+            label: "Home Dashboard",
+            isActive: currentIndex == 0,
+          ),
+          const SizedBox(height: 8),
+          _buildSideEmergencyNavItem(
+            context,
+            controller: controller,
+            index: 1,
+            isActive: currentIndex == 1,
+            isEmergencyActive: isEmergencyActive,
+          ),
+          const SizedBox(height: 8),
+          _buildSideNavItem(
+            context,
+            controller: controller,
+            index: 2,
+            icon: Icons.account_balance_wallet_rounded,
+            label: "Finances & Clarity",
+            isActive: currentIndex == 2,
+          ),
+          const SizedBox(height: 8),
+          _buildSideNavItem(
+            context,
+            controller: controller,
+            index: 3,
+            icon: Icons.person_rounded,
+            label: "Profile & AI Engine",
+            isActive: currentIndex == 3,
+          ),
+
+          const Spacer(),
+
+          // Theme Toggle & On-Device Status Footer
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: isDark ? AppColors.cardDark : AppColors.cardLight,
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(
+                color: isDark ? AppColors.borderDark : AppColors.borderLight,
+              ),
+            ),
+            child: Row(
+              children: [
+                const Icon(Icons.shield_outlined, color: AppColors.protectiveGreen, size: 20),
+                const SizedBox(width: 10),
+                const Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "On-Device Active",
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.protectiveGreen,
+                        ),
+                      ),
+                      Text(
+                        "Offline Ready",
+                        style: TextStyle(fontSize: 10, color: Colors.grey),
+                      ),
+                    ],
+                  ),
+                ),
+                IconButton(
+                  icon: Icon(
+                    controller.isDarkMode.value ? Icons.wb_sunny_rounded : Icons.nightlight_round,
+                    size: 18,
+                    color: AppColors.accentGold,
+                  ),
+                  onPressed: () => controller.toggleTheme(),
+                  tooltip: "Toggle Theme",
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSideNavItem(
+    BuildContext context, {
+    required AppController controller,
+    required int index,
+    required IconData icon,
+    required String label,
+    required bool isActive,
+  }) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    return Material(
+      color: Colors.transparent,
+      borderRadius: BorderRadius.circular(14),
+      child: InkWell(
+        onTap: () => controller.changeTab(index),
+        borderRadius: BorderRadius.circular(14),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+          decoration: BoxDecoration(
+            color: isActive
+                ? AppColors.primaryTeal.withValues(alpha: 0.15)
+                : Colors.transparent,
+            borderRadius: BorderRadius.circular(14),
+            border: isActive
+                ? Border.all(color: AppColors.primaryTeal.withValues(alpha: 0.3))
+                : null,
+          ),
+          child: Row(
+            children: [
+              Icon(
+                icon,
+                color: isActive
+                    ? AppColors.primaryTeal
+                    : (isDark ? AppColors.textMutedDark : AppColors.textMutedLight),
+                size: 22,
+              ),
+              const SizedBox(width: 12),
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: isActive ? FontWeight.bold : FontWeight.w500,
+                  color: isActive
+                      ? (isDark ? Colors.white : AppColors.primaryTeal)
+                      : (isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSideEmergencyNavItem(
+    BuildContext context, {
+    required AppController controller,
+    required int index,
+    required bool isActive,
+    required bool isEmergencyActive,
+  }) {
+    return Material(
+      color: Colors.transparent,
+      borderRadius: BorderRadius.circular(14),
+      child: InkWell(
+        onTap: () => controller.changeTab(index),
+        borderRadius: BorderRadius.circular(14),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+          decoration: BoxDecoration(
+            gradient: isEmergencyActive
+                ? const LinearGradient(
+                    colors: [AppColors.emergencyRed, Color(0xFFC02633)],
+                  )
+                : (isActive
+                    ? const LinearGradient(
+                        colors: [AppColors.accentGold, Color(0xFFB5840A)],
+                      )
+                    : null),
+            color: (!isEmergencyActive && !isActive)
+                ? AppColors.accentGold.withValues(alpha: 0.1)
+                : null,
+            borderRadius: BorderRadius.circular(14),
+          ),
+          child: Row(
+            children: [
+              Icon(
+                Icons.medical_services_rounded,
+                color: (isEmergencyActive || isActive) ? Colors.white : AppColors.accentGold,
+                size: 22,
+              ),
+              const SizedBox(width: 12),
+              Text(
+                "SOS Emergency",
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                  color: (isEmergencyActive || isActive)
+                      ? Colors.white
+                      : AppColors.accentGold,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
   Widget _buildNavItem(

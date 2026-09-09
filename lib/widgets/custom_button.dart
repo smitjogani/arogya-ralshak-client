@@ -10,6 +10,8 @@ class CustomButton extends StatelessWidget {
   final IconData? icon;
   final bool isLoading;
   final bool fullWidth;
+  final double? fontSize;
+  final EdgeInsetsGeometry? padding;
 
   const CustomButton({
     super.key,
@@ -19,6 +21,8 @@ class CustomButton extends StatelessWidget {
     this.icon,
     this.isLoading = false,
     this.fullWidth = true,
+    this.fontSize,
+    this.padding,
   });
 
   @override
@@ -31,31 +35,52 @@ class CustomButton extends StatelessWidget {
       children: [
         if (isLoading) ...[
           SizedBox(
-            width: 20,
-            height: 20,
+            width: 18,
+            height: 18,
             child: CircularProgressIndicator(
               strokeWidth: 2.5,
               valueColor: AlwaysStoppedAnimation<Color>(
-                type == ButtonType.secondaryGold ? AppColors.accentGold : Colors.white,
+                type == ButtonType.secondaryGold
+                    ? AppColors.accentGold
+                    : Colors.white,
               ),
             ),
           ),
-          const SizedBox(width: 10),
-        ] else if (icon != null) ...[
-          Icon(icon, size: 20),
           const SizedBox(width: 8),
+        ] else if (icon != null) ...[
+          Icon(icon, size: 18),
+          const SizedBox(width: 6),
         ],
-        Text(
-          text,
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-            letterSpacing: 0.3,
-            color: _getTextColor(isDark),
+        Flexible(
+          child: Text(
+            text,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              fontSize: fontSize ?? 15,
+              fontWeight: FontWeight.w600,
+              letterSpacing: 0.2,
+              color: _getTextColor(isDark),
+            ),
           ),
         ),
       ],
     );
+
+    EdgeInsetsGeometry defaultPadding;
+    switch (type) {
+      case ButtonType.emergency:
+        defaultPadding = const EdgeInsets.symmetric(horizontal: 16, vertical: 14);
+        break;
+      case ButtonType.text:
+        defaultPadding = const EdgeInsets.symmetric(horizontal: 12, vertical: 10);
+        break;
+      default:
+        defaultPadding = const EdgeInsets.symmetric(horizontal: 18, vertical: 14);
+        break;
+    }
+
+    final effectivePadding = padding ?? defaultPadding;
 
     Widget container;
     switch (type) {
@@ -81,8 +106,10 @@ class CustomButton extends StatelessWidget {
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.transparent,
               shadowColor: Colors.transparent,
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              padding: effectivePadding,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
             ),
             child: buttonChild,
           ),
@@ -95,8 +122,10 @@ class CustomButton extends StatelessWidget {
           style: OutlinedButton.styleFrom(
             foregroundColor: AppColors.accentGold,
             side: const BorderSide(color: AppColors.accentGold, width: 2),
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            padding: effectivePadding,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
           ),
           child: buttonChild,
         );
@@ -125,8 +154,10 @@ class CustomButton extends StatelessWidget {
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.transparent,
               shadowColor: Colors.transparent,
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 18),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+              padding: effectivePadding,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
             ),
             child: buttonChild,
           ),
@@ -138,7 +169,7 @@ class CustomButton extends StatelessWidget {
           onPressed: isLoading ? null : onPressed,
           style: TextButton.styleFrom(
             foregroundColor: AppColors.primaryTeal,
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            padding: effectivePadding,
           ),
           child: buttonChild,
         );
@@ -146,10 +177,7 @@ class CustomButton extends StatelessWidget {
     }
 
     if (fullWidth) {
-      return SizedBox(
-        width: double.infinity,
-        child: container,
-      );
+      return SizedBox(width: double.infinity, child: container);
     }
 
     return container;

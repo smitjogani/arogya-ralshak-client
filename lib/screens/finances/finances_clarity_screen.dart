@@ -5,6 +5,7 @@ import '../../theme/app_colors.dart';
 import '../../widgets/ai_insight_card.dart';
 import '../../widgets/app_card.dart';
 import '../../widgets/custom_chart.dart';
+import '../../widgets/responsive_layout.dart';
 import '../../widgets/section_header.dart';
 import '../../widgets/status_badge.dart';
 
@@ -15,6 +16,7 @@ class FinancesClarityScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final AppController controller = Get.find<AppController>();
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isWide = ResponsiveLayout.isWide(context);
 
     final Map<String, double> categoryData = {
       'Hospitalization': 45000.0,
@@ -43,80 +45,160 @@ class FinancesClarityScreen extends StatelessWidget {
           const SizedBox(width: 8),
         ],
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 18.0, vertical: 12.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Total Spend Header Card
-            _buildSpendSummaryCard(isDark, controller),
-            const SizedBox(height: 18),
+      body: ResponsiveCenter(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 18.0, vertical: 12.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Top Cards: Side-by-side on wide screens, stacked on mobile
+              if (isWide) ...[
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(child: _buildSpendSummaryCard(isDark, controller)),
+                    const SizedBox(width: 16),
+                    Expanded(child: _buildInsuranceUtilizationCard(isDark, controller)),
+                  ],
+                ),
+                const SizedBox(height: 22),
+              ] else ...[
+                _buildSpendSummaryCard(isDark, controller),
+                const SizedBox(height: 18),
+                _buildInsuranceUtilizationCard(isDark, controller),
+                const SizedBox(height: 20),
+              ],
 
-            // Insurance Coverage Utilization Bar
-            _buildInsuranceUtilizationCard(isDark, controller),
-            const SizedBox(height: 20),
-
-            // Spend Breakdown by Category Chart
-            SectionHeader(
-              title: "Category Spend Breakdown",
-              subtitle: "Distribution across medical services",
-              icon: Icons.pie_chart_rounded,
-            ),
-            const SizedBox(height: 10),
-            AppCard(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                children: [
-                  CategorySpendChart(categoryData: categoryData),
-                  const SizedBox(height: 12),
-                  Divider(color: isDark ? AppColors.borderDark : AppColors.borderLight),
-                  const SizedBox(height: 8),
-                  const Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              // Chart & AI Recommendations: Side-by-side on wide screens, stacked on mobile
+              if (isWide) ...[
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      flex: 5,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SectionHeader(
+                            title: "Category Spend Breakdown",
+                            subtitle: "Distribution across medical services",
+                            icon: Icons.pie_chart_rounded,
+                          ),
+                          const SizedBox(height: 10),
+                          AppCard(
+                            padding: const EdgeInsets.all(16),
+                            child: Column(
+                              children: [
+                                CategorySpendChart(categoryData: categoryData),
+                                const SizedBox(height: 12),
+                                Divider(color: isDark ? AppColors.borderDark : AppColors.borderLight),
+                                const SizedBox(height: 8),
+                                const Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text("Top Expense Category:", style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w600)),
+                                    Text("Hospitalization (65.9%)", style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.bold, color: AppColors.primaryTeal)),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 18),
+                    Expanded(
+                      flex: 5,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SectionHeader(
+                            title: "AI Financial Recommendations",
+                            subtitle: "Optimizations computed locally by Aarogya-AI",
+                            icon: Icons.psychology_rounded,
+                          ),
+                          const SizedBox(height: 10),
+                          Obx(() => Column(
+                                children: controller.aiInsights
+                                    .map((insight) => Padding(
+                                          padding: const EdgeInsets.only(bottom: 12.0),
+                                          child: AIInsightCard(
+                                            insight: insight,
+                                            onAction: () {
+                                              Get.snackbar("AI Recommendation", "Navigating to policy optimization tool", backgroundColor: AppColors.primaryTeal, colorText: Colors.white);
+                                            },
+                                          ),
+                                        ))
+                                    .toList(),
+                              )),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 22),
+              ] else ...[
+                SectionHeader(
+                  title: "Category Spend Breakdown",
+                  subtitle: "Distribution across medical services",
+                  icon: Icons.pie_chart_rounded,
+                ),
+                const SizedBox(height: 10),
+                AppCard(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
                     children: [
-                      Text("Top Expense Category:", style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w600)),
-                      Text("Hospitalization (65.9%)", style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.bold, color: AppColors.primaryTeal)),
+                      CategorySpendChart(categoryData: categoryData),
+                      const SizedBox(height: 12),
+                      Divider(color: isDark ? AppColors.borderDark : AppColors.borderLight),
+                      const SizedBox(height: 8),
+                      const Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text("Top Expense Category:", style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w600)),
+                          Text("Hospitalization (65.9%)", style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.bold, color: AppColors.primaryTeal)),
+                        ],
+                      ),
                     ],
                   ),
-                ],
+                ),
+                const SizedBox(height: 22),
+
+                SectionHeader(
+                  title: "AI Financial Recommendations",
+                  subtitle: "Optimizations computed locally by Aarogya-AI",
+                  icon: Icons.psychology_rounded,
+                ),
+                const SizedBox(height: 10),
+                Obx(() => Column(
+                      children: controller.aiInsights
+                          .map((insight) => Padding(
+                                padding: const EdgeInsets.only(bottom: 12.0),
+                                child: AIInsightCard(
+                                  insight: insight,
+                                  onAction: () {
+                                    Get.snackbar("AI Recommendation", "Navigating to policy optimization tool", backgroundColor: AppColors.primaryTeal, colorText: Colors.white);
+                                  },
+                                ),
+                              ))
+                          .toList(),
+                    )),
+                const SizedBox(height: 20),
+              ],
+
+              // Category Filter Chips & Bill Activity
+              SectionHeader(
+                title: "All Medical Bills & Claims",
+                subtitle: "Track status & out-of-pocket expenses",
+                icon: Icons.receipt_long_rounded,
               ),
-            ),
-            const SizedBox(height: 22),
-
-            // AI Financial Insights Section
-            SectionHeader(
-              title: "AI Financial Recommendations",
-              subtitle: "Optimizations computed locally by Aarogya-AI",
-              icon: Icons.psychology_rounded,
-            ),
-            const SizedBox(height: 10),
-            Obx(() => Column(
-                  children: controller.aiInsights
-                      .map((insight) => Padding(
-                            padding: const EdgeInsets.only(bottom: 12.0),
-                            child: AIInsightCard(
-                              insight: insight,
-                              onAction: () {
-                                Get.snackbar("AI Recommendation", "Navigating to policy optimization tool", backgroundColor: AppColors.primaryTeal, colorText: Colors.white);
-                              },
-                            ),
-                          ))
-                      .toList(),
-                )),
-            const SizedBox(height: 20),
-
-            // Category Filter Chips & Bill Activity
-            SectionHeader(
-              title: "All Medical Bills & Claims",
-              subtitle: "Track status & out-of-pocket expenses",
-              icon: Icons.receipt_long_rounded,
-            ),
-            const SizedBox(height: 8),
-            _buildCategoryFilterChips(controller, isDark),
-            const SizedBox(height: 12),
-            _buildFilteredBillsList(controller, isDark),
-            const SizedBox(height: 24),
-          ],
+              const SizedBox(height: 8),
+              _buildCategoryFilterChips(controller, isDark),
+              const SizedBox(height: 12),
+              _buildFilteredBillsList(controller, isDark),
+              const SizedBox(height: 24),
+            ],
+          ),
         ),
       ),
     );
