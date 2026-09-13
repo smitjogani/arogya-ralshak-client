@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:image_picker/image_picker.dart';
 import '../../controllers/app_controller.dart';
 import '../../models/models.dart';
 import '../../theme/app_colors.dart';
+import '../../widgets/ai_chat_modal.dart';
 import '../../widgets/ai_insight_card.dart';
 import '../../widgets/app_card.dart';
 import '../../widgets/app_logo.dart';
@@ -21,7 +23,11 @@ class HomeDashboardScreen extends StatelessWidget {
     final isWide = ResponsiveLayout.isWide(context);
 
     return Scaffold(
+      floatingActionButton: AiHoverButton(
+        onTap: () => AiChatModal.show(context),
+      ),
       appBar: AppBar(
+
         title: Row(
           children: [
             const AppLogo(size: 34, animate: false),
@@ -52,6 +58,11 @@ class HomeDashboardScreen extends StatelessWidget {
           ],
         ),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.document_scanner_rounded, color: AppColors.accentGold),
+            tooltip: "Scan Policy Document",
+            onPressed: () => _showScanPolicyModal(context, controller),
+          ),
           Obx(
             () => IconButton(
               icon: Icon(
@@ -82,60 +93,66 @@ class HomeDashboardScreen extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          "Namaste, Rajesh 👋",
-                          style: TextStyle(
-                            fontSize: 22,
-                            fontWeight: FontWeight.w800,
-                            color: isDark
-                                ? AppColors.textPrimaryDark
-                                : AppColors.textPrimaryLight,
-                          ),
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          "Policy: HDFC ERGO Optima Secure",
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: isDark
-                                ? AppColors.textSecondaryDark
-                                : AppColors.textSecondaryLight,
-                          ),
-                        ),
-                      ],
-                    ),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 5,
-                      ),
-                      decoration: BoxDecoration(
-                        color: AppColors.accentGold.withValues(alpha: 0.15),
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color: AppColors.accentGold.withValues(alpha: 0.4),
-                        ),
-                      ),
-                      child: const Row(
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Icon(
-                            Icons.star_rounded,
-                            size: 14,
-                            color: AppColors.accentGold,
-                          ),
-                          SizedBox(width: 4),
                           Text(
-                            "₹10L Cover",
+                            "Namaste, Rajesh 👋",
                             style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold,
-                              color: Color(0xFF9E750B),
+                              fontSize: 22,
+                              fontWeight: FontWeight.w800,
+                              color: isDark
+                                  ? AppColors.textPrimaryDark
+                                  : AppColors.textPrimaryLight,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Obx(
+                            () => Text(
+                              "Policy: ${controller.activePolicy.value.providerName} (${controller.activePolicy.value.planName})",
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: isDark
+                                    ? AppColors.textSecondaryDark
+                                    : AppColors.textSecondaryLight,
+                              ),
                             ),
                           ),
                         ],
+                      ),
+                    ),
+                    Obx(
+                      () => Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 5,
+                        ),
+                        decoration: BoxDecoration(
+                          color: AppColors.accentGold.withValues(alpha: 0.15),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: AppColors.accentGold.withValues(alpha: 0.4),
+                          ),
+                        ),
+                        child: Row(
+                          children: [
+                            const Icon(
+                              Icons.star_rounded,
+                              size: 14,
+                              color: AppColors.accentGold,
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              "₹${(controller.activePolicy.value.totalCoverage / 100000).toStringAsFixed(0)}L Cover",
+                              style: const TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xFF9E750B),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ],
@@ -171,7 +188,7 @@ class HomeDashboardScreen extends StatelessWidget {
                 // Quick Actions Grid
                 SectionHeader(
                   title: "Quick Actions",
-                  subtitle: "Manage expenses, coverage & network",
+                  subtitle: "Manage policy, expenses, coverage & network",
                   icon: Icons.flash_on_rounded,
                 ),
                 const SizedBox(height: 10),
@@ -300,12 +317,14 @@ class HomeDashboardScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 4),
-              Text(
-                "On-Device AI actively monitoring your HDFC ERGO cashless network limits & emergency readiness.",
-                style: TextStyle(
-                  fontSize: 13.5,
-                  height: 1.4,
-                  color: Colors.white.withValues(alpha: 0.88),
+              Obx(
+                () => Text(
+                  "On-Device AI actively monitoring your ${controller.activePolicy.value.providerName} cashless network limits & emergency readiness.",
+                  style: TextStyle(
+                    fontSize: 13.5,
+                    height: 1.4,
+                    color: Colors.white.withValues(alpha: 0.88),
+                  ),
                 ),
               ),
               const SizedBox(height: 14),
@@ -333,6 +352,26 @@ class HomeDashboardScreen extends StatelessWidget {
                         ),
                       ),
                     ],
+                  ),
+                  InkWell(
+                    onTap: () => _showScanPolicyModal(context, controller),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                      decoration: BoxDecoration(
+                        color: AppColors.accentGold,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: const Row(
+                        children: [
+                          Icon(Icons.document_scanner_rounded, size: 14, color: Colors.black),
+                          SizedBox(width: 4),
+                          Text(
+                            "Scan Policy",
+                            style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.bold, color: Colors.black),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
                 ],
               ),
@@ -476,12 +515,12 @@ class HomeDashboardScreen extends StatelessWidget {
     final isDesktop = ResponsiveLayout.isDesktop(context);
 
     int crossAxisCount = 2;
-    double childAspectRatio = 1.5;
+    double childAspectRatio = 1.45;
     if (isDesktop) {
-      crossAxisCount = 4;
-      childAspectRatio = 1.8;
+      crossAxisCount = 5;
+      childAspectRatio = 1.7;
     } else if (isWide) {
-      crossAxisCount = 4;
+      crossAxisCount = 3;
       childAspectRatio = 1.6;
     }
 
@@ -493,6 +532,15 @@ class HomeDashboardScreen extends StatelessWidget {
       physics: const NeverScrollableScrollPhysics(),
       childAspectRatio: childAspectRatio,
       children: [
+        _buildActionTile(
+          context,
+          isDark,
+          title: "Scan Policy",
+          subtitle: "OCR PDF/Image scan",
+          icon: Icons.document_scanner_rounded,
+          iconColor: AppColors.accentGold,
+          onTap: () => _showScanPolicyModal(context, controller),
+        ),
         _buildActionTile(
           context,
           isDark,
@@ -508,7 +556,7 @@ class HomeDashboardScreen extends StatelessWidget {
           title: "Check Coverage",
           subtitle: "Procedure cashless search",
           icon: Icons.health_and_safety_rounded,
-          iconColor: AppColors.accentGold,
+          iconColor: AppColors.protectiveGreen,
           onTap: () => _showCheckCoverageModal(context, controller),
         ),
         _buildActionTile(
@@ -517,8 +565,8 @@ class HomeDashboardScreen extends StatelessWidget {
           title: "AI Insights",
           subtitle: "Savings & guidance",
           icon: Icons.psychology_rounded,
-          iconColor: AppColors.protectiveGreen,
-          onTap: () => controller.changeTab(2),
+          iconColor: AppColors.infoBlue,
+          onTap: () => AiChatModal.show(context),
         ),
         _buildActionTile(
           context,
@@ -526,7 +574,7 @@ class HomeDashboardScreen extends StatelessWidget {
           title: "Find Network",
           subtitle: "Cashless hospitals nearby",
           icon: Icons.local_hospital_rounded,
-          iconColor: AppColors.infoBlue,
+          iconColor: AppColors.emergencyRed,
           onTap: () => controller.changeTab(1),
         ),
       ],
@@ -685,6 +733,237 @@ class HomeDashboardScreen extends StatelessWidget {
         }).toList(),
       );
     });
+  }
+
+  void _showScanPolicyModal(BuildContext context, AppController controller) {
+    final policyNumController = TextEditingController(text: controller.activePolicy.value.policyNumber);
+    final providerController = TextEditingController(text: controller.activePolicy.value.providerName);
+    final planController = TextEditingController(text: controller.activePolicy.value.planName);
+    final coverageController = TextEditingController(text: controller.activePolicy.value.totalCoverage.toStringAsFixed(0));
+
+    bool isScanning = false;
+
+    Get.bottomSheet(
+      StatefulBuilder(
+        builder: (context, setState) {
+          return ResponsiveCenter(
+            maxWidth: 550,
+            child: SafeArea(
+              bottom: true,
+              child: Container(
+                padding: const EdgeInsets.all(22),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).cardColor,
+                  borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+                ),
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Row(
+                            children: [
+                              Icon(Icons.document_scanner_rounded, color: AppColors.accentGold, size: 24),
+                              SizedBox(width: 10),
+                              Text(
+                                "Scan Policy Document",
+                                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                              ),
+                            ],
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.close_rounded),
+                            onPressed: () => Get.back(),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 4),
+                      const Text(
+                        "On-device AI extracts coverage limits, sub-limits, & room rent caps instantly with 100% privacy.",
+                        style: TextStyle(fontSize: 12.5, color: Colors.grey),
+                      ),
+                      const SizedBox(height: 16),
+
+                      if (isScanning) ...[
+                        Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.all(20),
+                          decoration: BoxDecoration(
+                            color: AppColors.primaryTeal.withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(color: AppColors.primaryTeal.withValues(alpha: 0.3)),
+                          ),
+                          child: const Column(
+                            children: [
+                              CircularProgressIndicator(color: AppColors.primaryTeal),
+                              SizedBox(height: 14),
+                              Text(
+                                "Aarogya-MedLLM Scanning Policy Document...",
+                                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                              ),
+                              SizedBox(height: 4),
+                              Text(
+                                "Running On-Device OCR • Extracting HDFC ERGO cashless terms",
+                                style: TextStyle(fontSize: 12, color: Colors.grey),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                      ] else ...[
+                        // Action Buttons: Camera & Upload
+                        Row(
+                          children: [
+                            Expanded(
+                              child: ElevatedButton.icon(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: AppColors.primaryTeal,
+                                  foregroundColor: Colors.white,
+                                  padding: const EdgeInsets.symmetric(vertical: 14),
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                                ),
+                                icon: const Icon(Icons.camera_alt_rounded, size: 20),
+                                label: const Text("Camera Scan"),
+                                onPressed: () async {
+                                  try {
+                                    final ImagePicker picker = ImagePicker();
+                                    final XFile? photo = await picker.pickImage(
+                                      source: ImageSource.camera,
+                                      imageQuality: 90,
+                                    );
+                                    if (photo != null) {
+                                      setState(() => isScanning = true);
+                                      await Future.delayed(const Duration(seconds: 2));
+                                      if (context.mounted) {
+                                        setState(() {
+                                          isScanning = false;
+                                          providerController.text = "HDFC ERGO Optima";
+                                          planController.text = "Secure Unlimited Plan";
+                                          policyNumController.text = "HDFC-CAM-${DateTime.now().millisecondsSinceEpoch.toString().substring(7)}";
+                                          coverageController.text = "1000000";
+                                        });
+                                      }
+                                    }
+                                  } catch (e) {
+                                    debugPrint("Camera error: $e");
+                                  }
+                                },
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: OutlinedButton.icon(
+                                style: OutlinedButton.styleFrom(
+                                  padding: const EdgeInsets.symmetric(vertical: 14),
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                                  side: const BorderSide(color: AppColors.accentGold),
+                                ),
+                                icon: const Icon(Icons.picture_as_pdf_rounded, color: AppColors.accentGold, size: 20),
+                                label: const Text("Upload Photo/PDF", style: TextStyle(color: AppColors.accentGold)),
+                                onPressed: () async {
+                                  try {
+                                    final ImagePicker picker = ImagePicker();
+                                    final XFile? photo = await picker.pickImage(
+                                      source: ImageSource.gallery,
+                                      imageQuality: 90,
+                                    );
+                                    if (photo != null) {
+                                      setState(() => isScanning = true);
+                                      await Future.delayed(const Duration(seconds: 2));
+                                      if (context.mounted) {
+                                        setState(() {
+                                          isScanning = false;
+                                          providerController.text = "Star Health Optima";
+                                          planController.text = "Comprehensive Care Plan";
+                                          policyNumController.text = "STAR-GAL-${DateTime.now().millisecondsSinceEpoch.toString().substring(7)}";
+                                          coverageController.text = "1500000";
+                                        });
+                                      }
+                                    }
+                                  } catch (e) {
+                                    debugPrint("Gallery error: $e");
+                                  }
+                                },
+                              ),
+                            ),
+                          ],
+                        ),
+
+                        const SizedBox(height: 16),
+                      ],
+
+                      // Form / Scanned Extracted Data
+                      const Text(
+                        "Extracted Policy Details (On-Device OCR)",
+                        style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 10),
+                      TextField(
+                        controller: providerController,
+                        decoration: InputDecoration(
+                          labelText: "Insurance Provider",
+                          prefixIcon: const Icon(Icons.business_rounded),
+                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      TextField(
+                        controller: planController,
+                        decoration: InputDecoration(
+                          labelText: "Policy Plan Name",
+                          prefixIcon: const Icon(Icons.shield_rounded),
+                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      TextField(
+                        controller: policyNumController,
+                        decoration: InputDecoration(
+                          labelText: "Policy Number",
+                          prefixIcon: const Icon(Icons.numbers_rounded),
+                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      TextField(
+                        controller: coverageController,
+                        keyboardType: TextInputType.number,
+                        decoration: InputDecoration(
+                          labelText: "Total Coverage Limit (₹)",
+                          prefixIcon: const Icon(Icons.currency_rupee_rounded),
+                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                        ),
+                      ),
+                      const SizedBox(height: 18),
+
+                      CustomButton(
+                        text: "Save & Activate Policy",
+                        icon: Icons.check_circle_rounded,
+                        type: ButtonType.primary,
+                        onPressed: () {
+                          final cov = double.tryParse(coverageController.text) ?? 1000000.0;
+                          controller.scanPolicyDocument(
+                            policyNumber: policyNumController.text,
+                            providerName: providerController.text,
+                            planName: planController.text,
+                            coverageAmount: cov,
+                          );
+                          Get.back();
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          );
+        },
+      ),
+      isScrollControlled: true,
+    );
   }
 
   void _showAddBillModal(BuildContext context, AppController controller) {

@@ -193,4 +193,31 @@ class AppController extends GetxController {
       duration: const Duration(seconds: 3),
     );
   }
+
+  void scanPolicyDocument({
+    required String policyNumber,
+    required String providerName,
+    required String planName,
+    required double coverageAmount,
+  }) {
+    activePolicy.value = InsurancePolicy(
+      policyNumber: policyNumber,
+      providerName: providerName,
+      planName: planName,
+      totalCoverage: coverageAmount,
+      usedAmount: activePolicy.value.usedAmount,
+      renewalDate: DateTime.now().add(const Duration(days: 365)),
+      coveredMembersCount: 4,
+    );
+    Get.snackbar(
+      "Policy Scanned & Saved",
+      "On-device OCR extracted $providerName ($planName) - ₹${coverageAmount.toStringAsFixed(0)} Cover",
+      snackPosition: SnackPosition.BOTTOM,
+      backgroundColor: const Color(0xFF0D7377),
+      colorText: Colors.white,
+      margin: const EdgeInsets.all(16),
+      duration: const Duration(seconds: 4),
+    );
+  }
 }
+

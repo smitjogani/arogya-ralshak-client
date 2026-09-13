@@ -1,5 +1,6 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import 'package:lottie/lottie.dart';
 import '../theme/app_colors.dart';
 
 class AppLogo extends StatefulWidget {
@@ -8,6 +9,10 @@ class AppLogo extends StatefulWidget {
   final Color? shieldColor;
   final Color? crossColor;
   final Color? nodeColor;
+  final bool useLottie;
+  final bool useImage;
+  final String lottiePath;
+  final String imagePath;
 
   const AppLogo({
     super.key,
@@ -16,6 +21,10 @@ class AppLogo extends StatefulWidget {
     this.shieldColor,
     this.crossColor,
     this.nodeColor,
+    this.useLottie = false,
+    this.useImage = true,
+    this.lottiePath = 'assets/animations/aarogya_logo.json',
+    this.imagePath = 'assets/logo/logo.jpg',
   });
 
   @override
@@ -45,6 +54,100 @@ class _AppLogoState extends State<AppLogo> with SingleTickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    final double size = widget.size;
+
+    if (widget.useImage) {
+      final Widget imageWidget = Image.asset(
+        widget.imagePath,
+        width: size,
+        height: size,
+        fit: BoxFit.contain,
+        errorBuilder: (context, error, stackTrace) {
+          return CustomPaint(
+            size: Size(size, size),
+            painter: _LogoPainter(
+              pulseProgress: 0.5,
+              shieldColor: widget.shieldColor ?? AppColors.primaryTeal,
+              crossColor: widget.crossColor ?? Colors.white,
+              nodeColor: widget.nodeColor ?? AppColors.accentGold,
+            ),
+          );
+        },
+      );
+
+      if (widget.animate) {
+        return AnimatedBuilder(
+          animation: _controller,
+          builder: (context, child) {
+            return Transform.scale(
+              scale: 0.96 + (_controller.value * 0.08),
+              child: imageWidget,
+            );
+          },
+        );
+      }
+
+      return imageWidget;
+    } else if (widget.useLottie) {
+      return AnimatedBuilder(
+        animation: _controller,
+        builder: (context, child) {
+          final double glowProgress = widget.animate ? _controller.value : 0.5;
+
+          return Container(
+            width: size,
+            height: size,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(
+                  color: (widget.shieldColor ?? AppColors.primaryTeal).withValues(alpha: 0.35 + glowProgress * 0.2),
+                  blurRadius: 18 + (glowProgress * 8),
+                  spreadRadius: 2 + (glowProgress * 2),
+                ),
+                BoxShadow(
+                  color: (widget.nodeColor ?? AppColors.accentGold).withValues(alpha: 0.25),
+                  blurRadius: 22,
+                  spreadRadius: 3,
+                ),
+              ],
+            ),
+            child: Container(
+              padding: EdgeInsets.all(size * 0.03),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: LinearGradient(
+                  colors: [
+                    widget.nodeColor ?? AppColors.accentGold,
+                    widget.shieldColor ?? AppColors.primaryTeal,
+                  ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+              ),
+              child: ClipOval(
+                child: Lottie.asset(
+                  widget.lottiePath,
+                  width: size,
+                  height: size,
+                  fit: BoxFit.cover,
+                  animate: widget.animate,
+                  errorBuilder: (context, error, stackTrace) {
+                    return Image.asset(
+                      widget.imagePath,
+                      width: size,
+                      height: size,
+                      fit: BoxFit.contain,
+                    );
+                  },
+                ),
+              ),
+            ),
+          );
+        },
+      );
+    }
+
     return AnimatedBuilder(
       animation: _controller,
       builder: (context, child) {

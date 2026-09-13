@@ -3,7 +3,7 @@
 
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:abs/main.dart';
+import 'package:aarogya_rakshak/main.dart';
 
 void main() {
   testWidgets('App smoke test', (WidgetTester tester) async {
