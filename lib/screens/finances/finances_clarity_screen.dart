@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../controllers/app_controller.dart';
 import '../../theme/app_colors.dart';
+import '../../widgets/ai_audit_pipeline_modal.dart';
 import '../../widgets/ai_insight_card.dart';
+
 import '../../widgets/app_card.dart';
 import '../../widgets/custom_chart.dart';
 import '../../widgets/responsive_layout.dart';
@@ -30,6 +32,11 @@ class FinancesClarityScreen extends StatelessWidget {
         title: const Text("Medical Finances & Clarity"),
         actions: [
           IconButton(
+            icon: const Icon(Icons.auto_awesome_rounded, color: AppColors.primaryTeal),
+            onPressed: () => AiAuditPipelineModal.show(context),
+            tooltip: "Run AI 5-Step Audit",
+          ),
+          IconButton(
             icon: const Icon(Icons.picture_as_pdf_rounded, color: AppColors.accentGold),
             onPressed: () {
               Get.snackbar(
@@ -44,6 +51,7 @@ class FinancesClarityScreen extends StatelessWidget {
           ),
           const SizedBox(width: 8),
         ],
+
       ),
       body: ResponsiveCenter(
         child: SingleChildScrollView(

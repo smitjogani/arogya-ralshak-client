@@ -4,7 +4,9 @@ import '../theme/app_colors.dart';
 import '../widgets/app_logo.dart';
 import '../widgets/custom_button.dart';
 import '../widgets/responsive_layout.dart';
+import 'auth/auth_screen.dart';
 import 'main_navigation_shell.dart';
+
 
 class SplashOnboardingScreen extends StatefulWidget {
   const SplashOnboardingScreen({super.key});
@@ -51,6 +53,11 @@ class _SplashOnboardingScreenState extends State<SplashOnboardingScreen> with Si
   void _proceedToApp() {
     Get.offAll(() => const MainNavigationShell());
   }
+
+  void _proceedToAuth() {
+    Get.to(() => const AuthScreen());
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -176,8 +183,8 @@ class _SplashOnboardingScreenState extends State<SplashOnboardingScreen> with Si
               ),
               const SizedBox(height: 12),
               CustomButton(
-                text: "I already have an account",
-                onPressed: _proceedToApp,
+                text: "Sign In to Account",
+                onPressed: _proceedToAuth,
                 type: ButtonType.secondaryGold,
               ),
               const SizedBox(height: 12),
@@ -237,12 +244,12 @@ class _SplashOnboardingScreenState extends State<SplashOnboardingScreen> with Si
                       ],
                     ),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 18),
                   Text(
-                    "On-Device AI for Medical Emergency Financial Clarity & Offline Insurance Guidance",
+                    "On-Device AI for Medical Emergency Financial Clarity",
                     style: TextStyle(
                       fontSize: 18,
-                      height: 1.45,
+                      height: 1.4,
                       fontWeight: FontWeight.w500,
                       color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight,
                     ),
@@ -262,7 +269,7 @@ class _SplashOnboardingScreenState extends State<SplashOnboardingScreen> with Si
                       Expanded(
                         child: CustomButton(
                           text: "Sign In",
-                          onPressed: _proceedToApp,
+                          onPressed: _proceedToAuth,
                           type: ButtonType.secondaryGold,
                         ),
                       ),

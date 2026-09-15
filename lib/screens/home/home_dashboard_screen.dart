@@ -4,7 +4,9 @@ import 'package:image_picker/image_picker.dart';
 import '../../controllers/app_controller.dart';
 import '../../models/models.dart';
 import '../../theme/app_colors.dart';
+import '../../widgets/ai_audit_pipeline_modal.dart';
 import '../../widgets/ai_chat_modal.dart';
+
 import '../../widgets/ai_insight_card.dart';
 import '../../widgets/app_card.dart';
 import '../../widgets/app_logo.dart';
@@ -571,6 +573,15 @@ class HomeDashboardScreen extends StatelessWidget {
         _buildActionTile(
           context,
           isDark,
+          title: "AI 5-Step Audit",
+          subtitle: "Policy, bill & red flags",
+          icon: Icons.auto_awesome_rounded,
+          iconColor: AppColors.primaryTeal,
+          onTap: () => AiAuditPipelineModal.show(context),
+        ),
+        _buildActionTile(
+          context,
+          isDark,
           title: "Find Network",
           subtitle: "Cashless hospitals nearby",
           icon: Icons.local_hospital_rounded,
@@ -580,6 +591,7 @@ class HomeDashboardScreen extends StatelessWidget {
       ],
     );
   }
+
 
   Widget _buildActionTile(
     BuildContext context,

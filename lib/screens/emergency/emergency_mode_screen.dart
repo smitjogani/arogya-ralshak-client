@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../controllers/app_controller.dart';
 import '../../theme/app_colors.dart';
+import '../../widgets/ai_audit_pipeline_modal.dart';
 import '../../widgets/app_card.dart';
+
 import '../../widgets/custom_button.dart';
 import '../../widgets/responsive_layout.dart';
 import '../../widgets/status_badge.dart';
@@ -589,9 +591,16 @@ class _EmergencyModeScreenState extends State<EmergencyModeScreen> {
     return Column(
       children: [
         CustomButton(
+          text: "Execute AI 5-Step Audit & Desk Questions",
+          icon: Icons.auto_awesome_rounded,
+          type: ButtonType.primary,
+          onPressed: () => AiAuditPipelineModal.show(context),
+        ),
+        const SizedBox(height: 10),
+        CustomButton(
           text: "Share Emergency with Family",
           icon: Icons.share_rounded,
-          type: ButtonType.primary,
+          type: ButtonType.secondary,
           onPressed: () => _showShareFamilyModal(context, controller),
         ),
         const SizedBox(height: 10),
@@ -616,6 +625,7 @@ class _EmergencyModeScreenState extends State<EmergencyModeScreen> {
               ),
             ),
           ],
+
         ),
       ],
     );

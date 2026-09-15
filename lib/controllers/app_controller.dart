@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../models/models.dart';
+import '../models/ai_prompt_models.dart';
+import '../services/ai_prompt_service.dart';
 
 class AppController extends GetxController {
   static AppController get to => Get.find();
@@ -194,6 +196,31 @@ class AppController extends GetxController {
     );
   }
 
+  // AI 5-Step Pipeline Audit State
+  final Rxn<FullAnalysisPipelineResult> lastPipelineResult = Rxn<FullAnalysisPipelineResult>();
+  final RxBool isPipelineRunning = false.obs;
+
+  Future<void> runAiAuditPipeline(String policyText, String billText) async {
+    isPipelineRunning.value = true;
+    try {
+      final res = await AiPromptService.instance.runFullPipeline(
+        policyText: policyText,
+        billText: billText,
+      );
+      lastPipelineResult.value = res;
+    } catch (e) {
+      Get.snackbar(
+        "AI Audit Failed",
+        "Error running 5-prompt pipeline: $e",
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+    } finally {
+      isPipelineRunning.value = false;
+    }
+  }
+
   void scanPolicyDocument({
     required String policyNumber,
     required String providerName,
@@ -220,4 +247,5 @@ class AppController extends GetxController {
     );
   }
 }
+
 

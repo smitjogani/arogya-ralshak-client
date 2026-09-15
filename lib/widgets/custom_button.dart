@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import '../theme/app_colors.dart';
 
-enum ButtonType { primary, secondaryGold, emergency, text }
+enum ButtonType { primary, secondary, secondaryGold, emergency, text }
 
 class CustomButton extends StatelessWidget {
   final String text;
-  final VoidCallback onPressed;
+  final VoidCallback? onPressed;
   final ButtonType type;
   final IconData? icon;
   final bool isLoading;
@@ -16,7 +16,7 @@ class CustomButton extends StatelessWidget {
   const CustomButton({
     super.key,
     required this.text,
-    required this.onPressed,
+    this.onPressed,
     this.type = ButtonType.primary,
     this.icon,
     this.isLoading = false,
@@ -24,6 +24,7 @@ class CustomButton extends StatelessWidget {
     this.fontSize,
     this.padding,
   });
+
 
   @override
   Widget build(BuildContext context) {
@@ -116,6 +117,21 @@ class CustomButton extends StatelessWidget {
         );
         break;
 
+      case ButtonType.secondary:
+        container = OutlinedButton(
+          onPressed: isLoading ? null : onPressed,
+          style: OutlinedButton.styleFrom(
+            foregroundColor: AppColors.primaryTeal,
+            side: const BorderSide(color: AppColors.primaryTeal, width: 1.5),
+            padding: effectivePadding,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+          ),
+          child: buttonChild,
+        );
+        break;
+
       case ButtonType.secondaryGold:
         container = OutlinedButton(
           onPressed: isLoading ? null : onPressed,
@@ -130,6 +146,7 @@ class CustomButton extends StatelessWidget {
           child: buttonChild,
         );
         break;
+
 
       case ButtonType.emergency:
         container = Container(
@@ -188,10 +205,13 @@ class CustomButton extends StatelessWidget {
       case ButtonType.primary:
       case ButtonType.emergency:
         return Colors.white;
+      case ButtonType.secondary:
+        return AppColors.primaryTeal;
       case ButtonType.secondaryGold:
         return AppColors.accentGold;
       case ButtonType.text:
         return isDark ? AppColors.accentGold : AppColors.primaryTeal;
     }
   }
+
 }

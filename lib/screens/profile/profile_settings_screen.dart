@@ -3,6 +3,8 @@ import 'package:get/get.dart';
 import '../../controllers/app_controller.dart';
 import '../../theme/app_colors.dart';
 import '../../widgets/app_card.dart';
+import '../auth/auth_screen.dart';
+
 import '../../widgets/custom_button.dart';
 import '../../widgets/responsive_layout.dart';
 import '../../widgets/section_header.dart';
@@ -594,6 +596,22 @@ class ProfileSettingsScreen extends StatelessWidget {
             const Divider(height: 1),
             ListTile(
               leading: const Icon(
+                Icons.lock_open_rounded,
+                color: AppColors.primaryTeal,
+              ),
+              title: const Text(
+                "Account Security & Sign Out",
+                style: TextStyle(fontSize: 14.5, fontWeight: FontWeight.w600),
+              ),
+              subtitle: const Text("Manage password, registration & active account"),
+              trailing: const Icon(Icons.arrow_forward_ios_rounded, size: 16),
+              onTap: () {
+                Get.to(() => const AuthScreen());
+              },
+            ),
+            const Divider(height: 1),
+            ListTile(
+              leading: const Icon(
                 Icons.cleaning_services_rounded,
                 color: AppColors.warningOrange,
               ),
@@ -616,6 +634,7 @@ class ProfileSettingsScreen extends StatelessWidget {
       ),
     );
   }
+
 
   Widget _buildAccountActionsRow(BuildContext context) {
     return Column(
