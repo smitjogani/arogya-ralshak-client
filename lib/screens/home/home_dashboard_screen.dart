@@ -197,12 +197,12 @@ class HomeDashboardScreen extends StatelessWidget {
                 _buildQuickActionsGrid(context, controller, isDark),
                 const SizedBox(height: 22),
 
-                // AI Financial Insights Highlights
+                // AI Financial Insights Highlights (Finance Tab Action Commented Out)
                 SectionHeader(
                   title: "AI Clarity Insights",
                   subtitle: "On-device recommendations for savings",
-                  actionText: "View All",
-                  onActionTap: () => controller.changeTab(2),
+                  // actionText: "View All",
+                  // onActionTap: () => controller.changeTab(2), // Commented out Finance tab route
                   icon: Icons.auto_awesome_rounded,
                 ),
                 const SizedBox(height: 10),
@@ -212,7 +212,7 @@ class HomeDashboardScreen extends StatelessWidget {
                   }
                   return AIInsightCard(
                     insight: controller.aiInsights.first,
-                    onAction: () => controller.changeTab(2),
+                    // onAction: () => controller.changeTab(2), // Commented out Finance tab route
                   );
                 }),
                 const SizedBox(height: 22),
@@ -221,8 +221,8 @@ class HomeDashboardScreen extends StatelessWidget {
                 SectionHeader(
                   title: "Recent Medical Expenses",
                   subtitle: "Claims & pre-authorizations logged",
-                  actionText: "See Finances",
-                  onActionTap: () => controller.changeTab(2),
+                  // actionText: "See Finances",
+                  // onActionTap: () => controller.changeTab(2), // Commented out Finance tab route
                   icon: Icons.receipt_long_rounded,
                 ),
                 const SizedBox(height: 10),
@@ -335,26 +335,33 @@ class HomeDashboardScreen extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Row(
-                    children: [
-                      const Icon(
-                        Icons.memory_rounded,
-                        size: 16,
-                        color: AppColors.accentGold,
-                      ),
-                      const SizedBox(width: 6),
-                      Obx(
-                        () => Text(
-                          controller.aiModelVersion.value,
-                          style: const TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.accentGold,
+                  Expanded(
+                    child: Row(
+                      children: [
+                        const Icon(
+                          Icons.memory_rounded,
+                          size: 16,
+                          color: AppColors.accentGold,
+                        ),
+                        const SizedBox(width: 6),
+                        Expanded(
+                          child: Obx(
+                            () => Text(
+                              controller.aiModelVersion.value,
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                              style: const TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.accentGold,
+                              ),
+                            ),
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
+                  const SizedBox(width: 8),
                   InkWell(
                     onTap: () => _showScanPolicyModal(context, controller),
                     child: Container(
@@ -543,15 +550,15 @@ class HomeDashboardScreen extends StatelessWidget {
           iconColor: AppColors.accentGold,
           onTap: () => _showScanPolicyModal(context, controller),
         ),
-        _buildActionTile(
-          context,
-          isDark,
-          title: "Add Bill",
-          subtitle: "Scan or enter invoice",
-          icon: Icons.add_card_rounded,
-          iconColor: AppColors.primaryTeal,
-          onTap: () => _showAddBillModal(context, controller),
-        ),
+        // _buildActionTile(
+        //   context,
+        //   isDark,
+        //   title: "Add Bill",
+        //   subtitle: "Scan or enter invoice",
+        //   icon: Icons.add_card_rounded,
+        //   iconColor: AppColors.primaryTeal,
+        //   onTap: () => _showAddBillModal(context, controller),
+        // ), // Commented out Add Bill tile
         _buildActionTile(
           context,
           isDark,
@@ -978,6 +985,7 @@ class HomeDashboardScreen extends StatelessWidget {
     );
   }
 
+  // ignore: unused_element
   void _showAddBillModal(BuildContext context, AppController controller) {
     final titleController = TextEditingController();
     final providerController = TextEditingController();

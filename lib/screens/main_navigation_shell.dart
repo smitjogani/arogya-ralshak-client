@@ -5,7 +5,7 @@ import '../theme/app_colors.dart';
 import '../widgets/app_logo.dart';
 import '../widgets/responsive_layout.dart';
 import 'emergency/emergency_mode_screen.dart';
-import 'finances/finances_clarity_screen.dart';
+// import 'finances/finances_clarity_screen.dart';
 import 'home/home_dashboard_screen.dart';
 import 'profile/profile_settings_screen.dart';
 
@@ -15,7 +15,8 @@ class MainNavigationShell extends StatelessWidget {
   static final List<Widget> _screens = [
     const HomeDashboardScreen(),
     const EmergencyModeScreen(),
-    const FinancesClarityScreen(),
+    // const FinancesClarityScreen(), // Commented out finance screen
+    const SizedBox.shrink(),
     const ProfileSettingsScreen(),
   ];
 
@@ -94,15 +95,15 @@ class MainNavigationShell extends StatelessWidget {
                     isActive: currentIndex == 1,
                     isEmergencyActive: isEmergencyActive,
                   ),
-                  _buildNavItem(
-                    context,
-                    controller: controller,
-                    index: 2,
-                    icon: Icons.account_balance_wallet_outlined,
-                    activeIcon: Icons.account_balance_wallet_rounded,
-                    label: "Finances",
-                    isActive: currentIndex == 2,
-                  ),
+                  // _buildNavItem(
+                  //   context,
+                  //   controller: controller,
+                  //   index: 2,
+                  //   icon: Icons.account_balance_wallet_outlined,
+                  //   activeIcon: Icons.account_balance_wallet_rounded,
+                  //   label: "Finances",
+                  //   isActive: currentIndex == 2,
+                  // ),
                   _buildNavItem(
                     context,
                     controller: controller,
@@ -185,15 +186,15 @@ class MainNavigationShell extends StatelessWidget {
             isActive: currentIndex == 1,
             isEmergencyActive: isEmergencyActive,
           ),
-          const SizedBox(height: 8),
-          _buildSideNavItem(
-            context,
-            controller: controller,
-            index: 2,
-            icon: Icons.account_balance_wallet_rounded,
-            label: "Finances & Clarity",
-            isActive: currentIndex == 2,
-          ),
+          // const SizedBox(height: 8),
+          // _buildSideNavItem(
+          //   context,
+          //   controller: controller,
+          //   index: 2,
+          //   icon: Icons.account_balance_wallet_rounded,
+          //   label: "Finances & Clarity",
+          //   isActive: currentIndex == 2,
+          // ),
           const SizedBox(height: 8),
           _buildSideNavItem(
             context,

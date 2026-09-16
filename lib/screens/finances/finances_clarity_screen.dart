@@ -1,3 +1,6 @@
+// ============================================================================
+// NOTICE: FINANCE-RELATED MODULE IS COMMENTED OUT / DISABLED
+// ============================================================================
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../controllers/app_controller.dart';
@@ -11,6 +14,7 @@ import '../../widgets/responsive_layout.dart';
 import '../../widgets/section_header.dart';
 import '../../widgets/status_badge.dart';
 
+/// [FinancesClarityScreen] - Finance feature screen (Currently disabled/commented out from navigation)
 class FinancesClarityScreen extends StatelessWidget {
   const FinancesClarityScreen({super.key});
 
